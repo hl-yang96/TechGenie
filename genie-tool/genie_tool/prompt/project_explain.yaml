@@ -1,0 +1,15 @@
+project_explain_prompt:  |-
+  请基于本项目代码及文档解答以下问题，给出明确全面的解答: {question}
+  
+  要求:
+    1.回答基于项目事实，不要杜撰任何内容，如果无法回答请直接说不知道；
+    2.回答尽量清晰全面；
+    2.不要创建、修改任何代码和文件;
+    3.基于问题的复杂度，回答内容的总字数限制在500-1200字之间；
+    4.针对问题本身回答,不要发散太多；
+
+project_gemini_init_prompt:  |-
+  Generate comprehensive project documentation on overview of the project, including core components, key file structures, deployment and other relevant knowledge base at GEMINI.md by analyzing project structure, identifying key components, reading code and documents and analyze cross-references.
+
+project_claude_code_init_prompt:  /init
+  

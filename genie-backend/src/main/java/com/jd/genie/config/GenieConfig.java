@@ -91,6 +91,12 @@ public class GenieConfig {
     @Value("${autobots.autoagent.tool.deep_search_tool.desc:}")
     private String deepSearchToolDesc;
 
+    @Value("${autobots.autoagent.tool.project_explain_tool.desc:}")
+    private String projectExplainToolDesc;
+
+    @Value("${autobots.autoagent.tool.vector_search_tool.desc:}")
+    private String vectorSearchToolDesc;
+
     /**
      * planTool 配置
      */
@@ -134,6 +140,24 @@ public class GenieConfig {
     @Value("${autobots.autoagent.tool.deep_search.params:{}}")
     public void setDeepSearchToolPamras(String jsonStr) {
         this.deepSearchToolPamras = JSON.parseObject(jsonStr, Map.class);
+    }
+
+    /**
+     * ProjectExplainTool 配置
+     */
+    private Map<String, Object> projectExplainToolParams = new HashMap<>();
+    @Value("${autobots.autoagent.tool.project_explain_tool.params:{}}")
+    public void setProjectExplainToolParams(String jsonStr) {
+        this.projectExplainToolParams = JSON.parseObject(jsonStr, Map.class);
+    }
+
+    /**
+     * VectorSearchTool 配置
+     */
+    private Map<String, Object> vectorSearchToolParams = new HashMap<>();
+    @Value("${autobots.autoagent.tool.vector_search_tool.params:{}}")
+    public void setVectorSearchToolParams(String jsonStr) {
+        this.vectorSearchToolParams = JSON.parseObject(jsonStr, Map.class);
     }
 
     @Value("${autobots.autoagent.tool.file_tool.truncate_len:5000}")

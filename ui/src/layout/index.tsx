@@ -4,6 +4,7 @@ import { ConfigProvider, message } from 'antd';
 import { ConstantProvider } from '@/hooks';
 import * as constants from "@/utils/constants";
 import { setMessage } from '@/utils';
+import { Header } from '@/components';
 
 // Layout 组件：应用的主要布局结构
 const Layout: GenieType.FC = memo(() => {
@@ -19,7 +20,12 @@ const Layout: GenieType.FC = memo(() => {
       {messageContent}
       {/* 暂时只有静态的 */}
       <ConstantProvider value={constants}>
-        <Outlet />
+        <div className="min-h-screen">
+          <Header />
+          <div className="pt-[64px]">
+            <Outlet />
+          </div>
+        </div>
       </ConstantProvider>
     </ConfigProvider>
   );

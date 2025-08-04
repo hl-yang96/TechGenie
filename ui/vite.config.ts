@@ -8,7 +8,23 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [
       react(),
-      tailwindcss()
+      tailwindcss(),
+      // 自定义插件来设置 .md 文件的正确 MIME 类型和编码
+      {
+        name: 'markdown-mime-type',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url && req.url.endsWith('.md')) {
+              // 设置正确的 MIME 类型和编码
+              res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+              res.setHeader('Content-Disposition', 'inline');
+              // 确保不缓存，避免编码问题
+              res.setHeader('Cache-Control', 'no-cache');
+            }
+            next();
+          });
+        }
+      }
     ],
     resolve: {
       alias: {

@@ -8,7 +8,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 配置文件路径
-CONFIG_FILE="genie-backend/src/main/resources/application.yml"
+CONFIG_FILE_TEMPLATE="genie-backend/src/main/resources/application.yml"
+CONFIG_FILE="genie-backend/src/main/resources/application-in-use.yml"
 ENV_TEMPLATE="genie-tool/.env_template"
 ENV_FILE="genie-tool/.env"
 
@@ -16,6 +17,7 @@ ENV_FILE="genie-tool/.env"
 check_config_completed() {
     if [ ! -f "$CONFIG_FILE" ]; then
         echo -e "${RED}❌ 配置文件 $CONFIG_FILE 不存在${NC}"
+        echo -e "${RED}❌ 请复制配置文件模板行配置: cp $CONFIG_FILE_TEMPLATE $CONFIG_FILE，然后进行配置。${NC}"
         return 1
     fi
     
@@ -148,6 +150,30 @@ init_setup() {
     echo "=================================="
 }
 
+start_chromadb() {
+    RET=$(docker compose ls | grep chroma | wc -l)
+    if [ $RET -eq 0 ]; then
+        echo -e "${BLUE}🔄 启动 ChromaDB 数据库...${NC}"
+        docker compose up -d chroma
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ ChromaDB 启动成功${NC}"
+        else
+            echo -e "${RED}❌ ChromaDB 启动失败，请检查 Docker 配置${NC}"
+            return 1
+        fi
+    else
+        echo -e "${YELLOW}⚠️ ChromaDB 已经在运行中${NC}"
+    fi
+    sleep 5  # 等待 ChromaDB 启动
+    echo -e "${BLUE}🔍 检查 ChromaDB 状态...${NC}"
+   if curl -s http://localhost:8000 > /dev/null 2>&1; then
+       echo -e "${GREEN}✅ ChromaDB 正在运行中${NC}"
+   else
+       echo -e "${RED}❌ ChromaDB 启动失败，请检查日志${NC}"
+       return 1
+   fi
+}
+
 # 启动前端服务
 start_frontend() {
     echo -e "${BLUE}🌐 启动前端服务...${NC}"
@@ -254,6 +280,7 @@ wait_for_services() {
     echo -e "${BLUE}⏳ 等待服务启动...${NC}"
     
     local services=(
+        "ChromaDB:8000"
         "前端服务:3000"
         "后端服务:8080" 
         "工具服务:1601"
@@ -443,6 +470,7 @@ main() {
     echo "=================================="
     
     # 启动各个服务
+    start_chromadb
     start_frontend
     start_backend
     start_tool_service

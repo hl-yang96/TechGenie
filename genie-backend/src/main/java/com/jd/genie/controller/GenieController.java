@@ -7,10 +7,12 @@ import com.jd.genie.agent.agent.AgentContext;
 import com.jd.genie.agent.printer.Printer;
 import com.jd.genie.agent.printer.SSEPrinter;
 import com.jd.genie.agent.tool.ToolCollection;
+import com.jd.genie.agent.tool.common.ProjectExplainTool;
 import com.jd.genie.agent.tool.common.CodeInterpreterTool;
 import com.jd.genie.agent.tool.common.DeepSearchTool;
 import com.jd.genie.agent.tool.common.FileTool;
 import com.jd.genie.agent.tool.common.ReportTool;
+import com.jd.genie.agent.tool.common.VectorSearchTool;
 import com.jd.genie.agent.tool.mcp.McpTool;
 import com.jd.genie.agent.util.DateUtil;
 import com.jd.genie.agent.util.ThreadUtil;
@@ -190,8 +192,13 @@ public class GenieController {
 
         // default tool
         List<String> agentToolList = Arrays.asList(genieConfig.getMultiAgentToolListMap()
-                .getOrDefault("default", "search,code,report").split(","));
+                .getOrDefault("default", "search,code,report,project_explain,vector_search").split(","));
         if (!agentToolList.isEmpty()) {
+            if (agentToolList.contains("project_explain")) {
+                ProjectExplainTool projectExplainTool = new ProjectExplainTool();
+                projectExplainTool.setAgentContext(agentContext);
+                toolCollection.addTool(projectExplainTool);
+            }
             if (agentToolList.contains("code")) {
                 CodeInterpreterTool codeTool = new CodeInterpreterTool();
                 codeTool.setAgentContext(agentContext);
@@ -206,6 +213,11 @@ public class GenieController {
                 DeepSearchTool deepSearchTool = new DeepSearchTool();
                 deepSearchTool.setAgentContext(agentContext);
                 toolCollection.addTool(deepSearchTool);
+            }
+            if (agentToolList.contains("vector_search")) {
+                VectorSearchTool vectorSearchTool = new VectorSearchTool();
+                vectorSearchTool.setAgentContext(agentContext);
+                toolCollection.addTool(vectorSearchTool);
             }
         }
 

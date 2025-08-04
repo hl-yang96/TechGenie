@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCoach：AI 面试教练技术全景报告</title>
+    <meta name="description" content="基于真实代码的 TechCoach 项目深度技术剖析，涵盖架构、AI 核心、前端实现、性能与部署全流程。">
+    
+    <!-- Tailwind CSS CDN -->
+    <link href="https://unpkg.com/tailwindcss@3.4.10/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- ECharts CDN -->
+    <script src="https://unpkg.com/echarts@5.5.1/dist/echarts.min.js"></script>
+    
+    <!-- Mermaid CDN for diagrams -->
+    <script src="https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    
+    <!-- Prism.js for code highlighting -->
+    <link href="https://unpkg.com/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet">
+    <script src="https://unpkg.com/prismjs@1.29.0/components/prism-core.min.js"></script>
+    <script src="https://unpkg.com/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .toc-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            z-index: 1000;
+            padding: 2rem 1.5rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+        }
+
+        .main-content {
+            margin-left: 320px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .toc-fixed {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .toc-fixed.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toc-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+        }
+
+        .toc-toggle {
+            display: none;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .subsection-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: #ffffff;
+        }
+        
+        .mermaid-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .toc-link {
+            display: block;
+            padding: 0.5rem 0;
+            color: var(--secondary-color);
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .toc-link:hover, .toc-link.active {
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            background-color: #f1f5f9;
+            padding-left: 1.5rem;
+        }
+        
+        .toc-link.sub {
+            font-size: 0.9rem;
+            padding-left: 2rem;
+        }
+        
+        .toc-link.sub:hover, .toc-link.sub.active {
+            padding-left: 2.5rem;
+        }
+        
+        .highlight-box {
+            background-color: #e6f7ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0.25rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .toc-fixed {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .toc-fixed.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 移动端目录切换按钮 -->
+    <button class="toc-toggle" onclick="toggleToc()">☰ 目录</button>
+
+    <!-- Table of Contents -->
+    <nav class="toc-fixed">
+        <h2 class="text-xl font-bold mb-4 text-gray-800">目录</h2>
+        <a href="#overview" class="toc-link">项目概述</a>
+        <a href="#architecture" class="toc-link">系统架构</a>
+            <a href="#architecture-overview" class="toc-link sub">整体架构</a>
+            <a href="#core-modules" class="toc-link sub">核心模块</a>
+            <a href="#tech-stack" class="toc-link sub">技术栈</a>
+        <a href="#ai-core" class="toc-link">AI 核心模块详解</a>
+            <a href="#agentic-core" class="toc-link sub">Agentic Core</a>
+            <a href="#rag-system" class="toc-link sub">RAG 系统</a>
+            <a href="#crew-ai" class="toc-link sub">CrewAI 工作流</a>
+        <a href="#frontend" class="toc-link">前端技术实现</a>
+            <a href="#frontend-overview" class="toc-link sub">前端架构</a>
+            <a href="#key-pages" class="toc-link sub">关键页面</a>
+        <a href="#performance-deployment" class="toc-link">性能与部署</a>
+            <a href="#performance-metrics" class="toc-link sub">性能指标</a>
+            <a href="#test-data" class="toc-link sub">测试数据</a>
+            <a href="#cicd" class="toc-link sub">CI/CD 流程</a>
+            <a href="#deployment-arch" class="toc-link sub">部署架构</a>
+        <a href="#user-workflow" class="toc-link">用户端功能流程</a>
+            <a href="#user-overview" class="toc-link sub">功能概述</a>
+            <a href="#api-details" class="toc-link sub">接口细节</a>
+        <a href="#conclusion" class="toc-link">总结</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="mb-8">
+            <h1 class="text-5xl font-extrabold text-center text-gray-900 mb-2">TechCoach：AI 面试教练技术全景报告</h1>
+            <p class="text-xl text-center text-gray-600">基于真实代码库的深度技术剖析</p>
+        </header>
+
+        <!-- Project Overview -->
+        <section id="overview">
+            <h2 class="section-title">项目概述</h2>
+            <p class="text-lg mb-4">
+                TechCoach 是一个面向求职者的、以大语言模型（LLM）为核心的个人技术面试教练平台。它通过分析用户上传的简历、项目经历和目标岗位描述，利用先进的 AI 技术生成高度定制化的模拟面试问题，帮助用户高效准备技术面试。
+            </p>
+            <div class="highlight-box">
+                <strong>核心目标：</strong> 将用户的个人背景材料转化为高质量的模拟面试体验，赋能个人求职者。
+            </div>
+            <p>
+                项目采用现代化的前后端分离架构，通过 Docker 容器化技术进行封装和部署，体现了微服务的设计思想。其核心创新在于将复杂的 AI 任务（如 RAG 检索和面试问题生成）分解为多个协同工作的智能体（Agent），从而提供精准、个性化的服务。
+            </p>
+        </section>
+
+        <!-- System Architecture -->
+        <section id="architecture">
+            <h2 class="section-title">系统架构</h2>
+            
+            <h3 id="architecture-overview" class="subsection-title">整体架构</h3>
+            <p>TechCoach 项目采用前后端分离的现代化 Web 应用架构，并通过 Docker 容器化技术进行封装和部署。整个系统由多个协同工作的服务组成，通过 <code>docker-compose.yml</code> 进行编排。</p>
+            
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    graph TD
+                        subgraph "User"
+                            U[Browser]
+                        end
+                        subgraph "Docker Compose Stack"
+                            F[Frontend<br/>Vue.js SPA]
+                            A[Backend API<br/>FastAPI]
+                            C[Vector DB<br/>ChromaDB]
+                        end
+                        subgraph "External Services"
+                            LLM[LLM Provider<br/>OpenAI/Gemini/etc.]
+                        end
+                        
+                        U -->|HTTPS| F
+                        F -->|REST API| A
+                        A -->|Vector Search| C
+                        A -->|LLM Calls| LLM
+                        
+                        style U fill:#f9f,stroke:#333,stroke-width:2px
+                        style F fill:#bbf,stroke:#333,stroke-width:2px
+                        style A fill:#9f9,stroke:#333,stroke-width:2px
+                        style C fill:#ff9,stroke:#333,stroke-width:2px
+                        style LLM fill:#f96,stroke:#333,stroke-width:2px
+                </div>
+            </div>
+
+            <h3 id="core-modules" class="subsection-title">核心模块</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="text-xl font-semibold text-blue-600 mb-2">后端核心模块 (app/)</h4>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><strong>gateway:</strong> API 网关，基于 FastAPI，负责请求分发和中间件处理。</li>
+                        <li><strong>agentic_core:</strong> AI 能力核心，实现 RAG、CrewAI 工作流和 LLM 路由。</li>
+                        <li><strong>question_service:</strong> 封装面试问题生成与管理的业务逻辑。</li>
+                        <li><strong>shared_kernel:</strong> 共享组件，如数据库模型、异常定义等。</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h4 class="text-xl font-semibold text-green-600 mb-2">前端核心模块 (frontend/)</h4>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><strong>views:</strong> 主要页面，如 Dashboard、Interview、Documents。</li>
+                        <li><strong>router:</strong> Vue Router 管理前端路由。</li>
+                        <li><strong>services:</strong> 封装与后端 API 的通信逻辑。</li>
+                        <li><strong>stores:</strong> Pinia 进行全局状态管理。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 id="tech-stack" class="subsection-title">技术栈</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-2 px-4 border-b">层级</th>
+                            <th class="py-2 px-4 border-b">技术</th>
+                            <th class="py-2 px-4 border-b">说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="py-2 px-4 border-b font-semibold">后端</td>
+                            <td class="py-2 px-4 border-b">Python, FastAPI, Uvicorn</td>
+                            <td class="py-2 px-4 border-b">高性能异步 API 服务</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b font-semibold">AI 框架</td>
+                            <td class="py-2 px-4 border-b">CrewAI, LangChain</td>
+                            <td class="py-2 px-4 border-b">智能体编排与 LLM 交互</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b font-semibold">数据库</td>
+                            <td class="py-2 px-4 border-b">PostgreSQL, ChromaDB</td>
+                            <td class="py-2 px-4 border-b">关系型数据与向量存储</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b font-semibold">前端</td>
+                            <td class="py-2 px-4 border-b">Vue.js 3, Vite, Pinia</td>
+                            <td class="py-2 px-4 border-b">现代化单页应用</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b font-semibold">部署</td>
+                            <td class="py-2 px-4 border-b">Docker, Docker Compose</td>
+                            <td class="py-2 px-4 border-b">容器化微服务部署</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- AI Core Module -->
+        <section id="ai-core">
+            <h2 class="section-title">AI 核心模块详解</h2>
+            
+            <h3 id="agentic-core" class="subsection-title">Agentic Core</h3>
+            <p>Agentic Core 是 TechCoach 项目最关键的智能中枢，它采用了智能体 (Agent) 和工作流 (Crew) 的模式，将复杂的 AI 任务分解为多个步骤，由不同的 Agent 协同完成。</p>
+            
+            <div class="highlight-box">
+                <strong>设计哲学：</strong> 通过模块化和分工，将复杂的 LLM 交互（如面试问题生成）转化为可管理、可扩展的智能体工作流。
+            </div>
+
+            <h4 class="text-lg font-semibold mt-4 mb-2">核心组件</h4>
+            <ul class="list-disc list-inside space-y-2">
+                <li><strong>LLM Router (llm_router/):</strong> 负责与底层的大语言模型服务进行通信，可能支持多种不同的 LLM。</li>
+                <li><strong>Agent Manager (agent_manager.py):</strong> 定义和管理多个 AI 智能体 (Agent)，每个 Agent 有特定的角色和工具。</li>
+                <li><strong>Tools (tools/):</strong> 为 AI 智能体提供可以使用的工具，例如文件读写、向量数据库搜索等。</li>
+            </ul>
+
+            <h3 id="rag-system" class="subsection-title">RAG 系统</h3>
+            <p>检索增强生成 (RAG) 是 TechCoach 实现个性化面试问题的核心技术。它允许系统从用户上传的文档中检索相关信息，并将其作为上下文提供给 LLM，从而生成更精准的问题。</p>
+            
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    sequenceDiagram
+                        participant U as User
+                        participant B as Backend API
+                        participant DP as Document Processor
+                        participant DS as Document Store (ChromaDB)
+                        participant AG as Agent Crew
+                        participant LLM as LLM Provider
+                        
+                        U->>B: Upload Resume & JD
+                        B->>DP: Process Documents
+                        DP->>DS: Store as Vectors
+                        U->>B: Request Interview Questions
+                        B->>AG: Trigger Crew
+                        AG->>DS: Vector Search (Query)
+                        DS-->>AG: Relevant Context
+                        AG->>LLM: Generate Questions with Context
+                        LLM-->>AG: Generated Questions
+                        AG-->>B: Final Question List
+                        B-->>U: Display Questions
+                </div>
+            </div>
+
+            <h3 id="crew-ai" class="subsection-title">CrewAI 工作流</h3>
+            <p>CrewAI 框架用于定义和管理 AI 智能体工作流。一个典型的面试问题生成任务可能涉及以下 Agent：</p>
+            <ol class="list-decimal list-inside space-y-2">
+                <li><strong>简历分析师 (Resume Analyst):</strong> 分析用户简历，提取关键技能和经验。</li>
+                <li><strong>岗位匹配师 (Job Matcher):</strong> 将简历与目标岗位描述进行匹配，识别差距。</li>
+                <li><strong>问题生成器 (Question Generator):</strong> 基于分析结果和匹配差距，生成具体的技术面试问题。</li>
+            </ol>
+            <div class="code-block">
+                <pre><code class="language-python"># 伪代码示例：定义一个 Crew
+from crewai import Crew, Agent, Task
+
+resume_analyst = Agent(
+    role='Resume Analyst',
+    goal='Extract key skills and experiences from the provided resume',
+    tools=[VectorSearchTool()]
+)
+
+job_matcher = Agent(
+    role='Job Matcher',
+    goal='Identify gaps between resume and job description',
+    tools=[VectorSearchTool()]
+)
+
+question_generator = Agent(
+    role='Question Generator',
+    goal='Create tailored technical interview questions

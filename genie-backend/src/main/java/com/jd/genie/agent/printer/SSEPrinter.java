@@ -34,7 +34,7 @@ public class SSEPrinter implements Printer {
             if (Objects.isNull(messageId)) {
                 messageId = StringUtil.getUUID();
             }
-            log.info("{} sse send {} {} {}", request.getRequestId(), messageType, message, digitalEmployee);
+            log.debug("{} sse send {} {} {}", request.getRequestId(), messageType, message, digitalEmployee);
             boolean finish = "result".equals(messageType);
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("agentType", agentType);

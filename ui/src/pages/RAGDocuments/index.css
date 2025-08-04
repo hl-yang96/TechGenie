@@ -1,0 +1,17 @@
+/* 文档列表样式 */
+
+/* 文档项悬停效果优化 */
+.document-item {
+  transition: all 0.2s ease-in-out;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.document-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(64, 64, 255, 0.1);
+}
+
+.document-item.selected {
+  box-shadow: 0 4px 12px rgba(64, 64, 255, 0.15);
+}

@@ -1,0 +1,8 @@
+genie-backend/genie-backend_startup.log
+.envrc
+genie-tool/file_db_dir/*
+ui/package.json
+ui/pnpm-lock.yaml
+genie-tool/autobots.db
+genie-backend/aliyun-settings.xml
+genie-backend/src/main/resources/application-in-use.yml

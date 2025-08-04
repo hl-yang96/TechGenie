@@ -25,7 +25,8 @@ async def get_file(
             content={"ossUrl": download_url, "downloadUrl": download_url, "domainUrl": preview_url, "requestId": body.request_id,
                      "fileName": body.file_name})
     else:
-        raise Exception("file not found")
+        return JSONResponse(
+            content={"error:": "file not found", "requestId": body.request_id, "fileName": body.file_name})
 
 
 @router.post("/upload_file")

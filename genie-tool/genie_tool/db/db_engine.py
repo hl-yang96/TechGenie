@@ -38,6 +38,9 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 def init_db():
     from genie_tool.db.file_table import FileInfo
+    from genie_tool.db.rag_documents_table import RagDocument
+    from genie_tool.db.project_table import Project
+    from genie_tool.db.chat_session_table import ChatSession
     SQLModel.metadata.create_all(engine)
     logger.info(f"DB init done")
 

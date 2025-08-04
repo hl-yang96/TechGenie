@@ -107,7 +107,7 @@ public class MultiAgentServiceImpl implements IMultiAgentService {
                             continue;
                         }
 
-                        log.info("{} recv from autocontroller: {}", autoReq.getRequestId(), data);
+                        log.debug("{} recv from autocontroller: {}", autoReq.getRequestId(), data);
                         AgentResponse agentResponse = JSON.parseObject(data, AgentResponse.class);
                         AgentType agentType = AgentType.fromCode(autoReq.getAgentType());
                         AgentResponseHandler handler = handlerMap.get(agentType);

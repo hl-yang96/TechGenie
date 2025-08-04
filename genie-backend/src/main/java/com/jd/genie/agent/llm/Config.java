@@ -34,7 +34,7 @@ public class Config {
      */
     private static LLMSettings getDefaultConfig() {
 
-        Resource resource = new ClassPathResource("application.yml");
+        Resource resource = new ClassPathResource("application-in-use.yml");
         YamlPropertiesFactoryBean yamlFactory = new YamlPropertiesFactoryBean();
         yamlFactory.setResources(resource);
         Properties props = yamlFactory.getObject();

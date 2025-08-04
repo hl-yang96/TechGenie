@@ -13,12 +13,14 @@ from fastapi import APIRouter
 from sse_starlette import ServerSentEvent, EventSourceResponse
 
 from genie_tool.model.code import ActionOutput, CodeOuput
-from genie_tool.model.protocal import CIRequest, ReportRequest, DeepSearchRequest
+from genie_tool.model.protocal import CIRequest, ReportRequest, DeepSearchRequest, ProjectExplainRequest, VectorSearchRequest
 from genie_tool.util.file_util import upload_file
 from genie_tool.tool.report import report
 from genie_tool.tool.code_interpreter import code_interpreter_agent
 from genie_tool.util.middleware_util import RequestHandlerRoute
 from genie_tool.tool.deepsearch import DeepSearch
+from genie_tool.tool.project_explain import project_explain_async
+from genie_tool.tool.vector_search import vector_search
 
 router = APIRouter(route_class=RequestHandlerRoute)
 
@@ -270,4 +272,52 @@ async def post_deepsearch(
         yield ServerSentEvent(data="[DONE]")
 
     return EventSourceResponse(_stream(), ping_message_factory=lambda: ServerSentEvent(data="heartbeat"), ping=15)
+
+
+@router.post("/project_explain")
+async def post_project_explain(
+    body: ProjectExplainRequest,
+):
+    """代码解释端点"""
+    try:
+        result = await project_explain_async(
+            path=body.path,
+            question=body.question,
+        )
+        return {
+            "code": 200,
+            "data": result,
+            "requestId": body.request_id,
+        }
+    except Exception as e:
+        return {
+            "code": 500,
+            "data": f"Error: {str(e)}",
+            "requestId": body.request_id,
+        }
+
+
+@router.post("/vector_search")
+async def post_vector_search(
+    body: VectorSearchRequest,
+):
+    """向量搜索端点"""
+    try:
+        result = vector_search(
+            query_text=body.query_text,
+            collection_types=body.collection_types,
+            top_k=body.top_k,
+            min_score=body.min_score
+        )
+        return {
+            "code": 200,
+            "data": result,
+            "requestId": body.request_id,
+        }
+    except Exception as e:
+        return {
+            "code": 500,
+            "data": f"Error: {str(e)}",
+            "requestId": body.request_id,
+        }
 

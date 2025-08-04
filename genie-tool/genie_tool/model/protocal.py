@@ -73,3 +73,17 @@ class DeepSearchRequest(BaseModel):
 
     stream: bool = Field(default=True, description="是否流式响应")
     stream_mode: Optional[StreamMode] = Field(default=StreamMode(), alias="streamMode", description="流式模式")
+
+
+class ProjectExplainRequest(BaseModel):
+    request_id: str = Field(alias="requestId", description="Request ID")
+    path: str = Field(description="项目的绝对路径")
+    question: str = Field(description="具体问题")
+
+
+class VectorSearchRequest(BaseModel):
+    request_id: str = Field(alias="requestId", description="Request ID")
+    query_text: str = Field(alias="queryText", description="搜索查询文本")
+    collection_types: Optional[List[str]] = Field(default=None, alias="collectionTypes", description="集合类型列表")
+    top_k: int = Field(default=5, alias="topK", description="返回结果数量")
+    min_score: float = Field(default=0.4, alias="minScore", description="最小相似度分数阈值")

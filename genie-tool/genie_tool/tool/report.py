@@ -65,7 +65,7 @@ async def ppt_report(
         .render(task=task, files=truncate_flat_files, date=datetime.now().strftime("%Y-%m-%d"))
 
     async for chunk in ask_llm(messages=prompt, model=model, stream=True,
-                               temperature=temperature, top_p=top_p, only_content=True):
+                               temperature=temperature, top_p=top_p, only_content=True,max_tokens=os.getenv("REPORT_MAX_TOKENS", 16384)):
         yield chunk
 
 
@@ -91,7 +91,7 @@ async def markdown_report(
         .render(task=task, files=truncate_flat_files, current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     async for chunk in ask_llm(messages=prompt, model=model, stream=True,
-                               temperature=temperature, top_p=top_p, only_content=True):
+                               temperature=temperature, top_p=top_p, only_content=True,max_tokens=os.getenv("REPORT_MAX_TOKENS", 16384)):
         yield chunk
 
 
@@ -145,7 +145,7 @@ async def html_report(
     async for chunk in ask_llm(
             messages=[{"role": "system", "content": report_prompts["html_prompt"]},
                       {"role": "user", "content": prompt}],
-            model=model, stream=True, temperature=temperature, top_p=top_p, only_content=True):
+            model=model, stream=True, temperature=temperature, top_p=top_p, only_content=True, max_tokens=os.getenv("REPORT_MAX_TOKENS", 16384)):
         yield chunk
 
 

@@ -1,4 +1,5 @@
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import GeneralInput from "@/components/GeneralInput";
 import Slogn from "@/components/Slogn";
 import ChatView from "@/components/ChatView";
@@ -9,18 +10,46 @@ import { demoList } from "@/utils/constants";
 type HomeProps = Record<string, never>;
 
 const Home: GenieType.FC<HomeProps> = memo(() => {
+  const { requestId } = useParams<{ requestId?: string }>();
+  const navigate = useNavigate();
   const [inputInfo, setInputInfo] = useState<CHAT.TInputInfo>({
     message: "",
     deepThink: false,
   });
   const [product, setProduct] = useState(defaultProduct);
   const [videoModalOpen, setVideoModalOpen] = useState();
+  const [isLoadingSession, setIsLoadingSession] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<CHAT.TInputInfo | null>(null);
 
   const changeInputInfo = useCallback((info: CHAT.TInputInfo) => {
     setInputInfo(info);
   }, []);
 
+  // 当有 requestId 时，加载对应的聊天会话
+  useEffect(() => {
+    console.log('Home: requestId changed to:', requestId);
+    if (requestId) {
+      setIsLoadingSession(true);
+      // 从 URL 参数加载时，不设置 inputInfo.message，避免触发新的请求
+      // ChatView 会根据 requestId 来判断是否是从 URL 加载的会话
+      setIsLoadingSession(false);
+    } else {
+      // 当没有 requestId 时（回到主页），重置 inputInfo 状态
+      console.log('Home: No requestId, resetting inputInfo');
+      setInputInfo({
+        message: "",
+        deepThink: false,
+      });
+    }
+  }, [requestId]);
+
   const CaseCard = ({ title, description, tag, image, url, videoUrl }: any) => {
+    const handleReportClick = () => {
+      window.open(url, '_blank');
+    };
+
+    const hasVideo = videoUrl && videoUrl.trim() !== '';
+
     return (
       <div className="group flex flex-col rounded-lg bg-white pt-16 px-16 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.1)] hover:-translate-y-[5px] transition-all duration-300 ease-in-out cursor-pointer w-full max-w-xs border border-[rgba(233,233,240,1)]">
         <div className="mb-4 flex items-center justify-between">
@@ -34,46 +63,66 @@ const Home: GenieType.FC<HomeProps> = memo(() => {
         </div>
         <div
           className="text-[#4040ff] group-hover:text-[#656cff] text-[12px] flex items-center mb-6 cursor-pointer transition-colors duration-200"
-          onClick={() => window.open(url)}
+          onClick={handleReportClick}
         >
           <span className="mr-1">查看报告</span>
           <i className="font_family icon-xinjianjiantou"></i>
         </div>
         <div className="relative rounded-t-[10px] overflow-hidden h-100 group-hover:scale-105 transition-transform duration-500 ease">
-          <Image
-            style={{ display: "none" }}
-            preview={{
-              visible: videoModalOpen === videoUrl,
-              destroyOnHidden: true,
-              imageRender: () => (
-                <video muted width="80%" controls autoPlay src={videoUrl} />
-              ),
-              toolbarRender: () => null,
-              onVisibleChange: () => {
-                setVideoModalOpen(undefined);
-              },
-            }}
-            src={image}
-          />
+          {hasVideo && (
+            <Image
+              style={{ display: "none" }}
+              preview={{
+                visible: videoModalOpen === videoUrl,
+                destroyOnHidden: true,
+                imageRender: () => (
+                  <video muted width="80%" controls autoPlay src={videoUrl} />
+                ),
+                toolbarRender: () => null,
+                onVisibleChange: () => {
+                  setVideoModalOpen(undefined);
+                },
+              }}
+              src={image}
+            />
+          )}
           <img
             src={image}
             className="w-full h-full rounded-t-[10px] mt-[-20px]"
           ></img>
-          <div
-            className="absolute inset-0 flex items-center justify-center cursor-pointer rounded-t-[10px] group hover:bg-[rgba(0,0,0,0.6)] border border-[#ededed]"
-            onClick={() => setVideoModalOpen(videoUrl)}
-          >
-            <i className="font_family icon-bofang hidden group-hover:block text-[#fff] text-[24px]"></i>
-          </div>
+          {hasVideo && (
+            <div
+              className="absolute inset-0 flex items-center justify-center cursor-pointer rounded-t-[10px] group hover:bg-[rgba(0,0,0,0.6)] border border-[#ededed]"
+              onClick={() => setVideoModalOpen(videoUrl)}
+            >
+              <i className="font_family icon-bofang hidden group-hover:block text-[#fff] text-[24px]"></i>
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
   const renderContent = () => {
+    console.log('Home: renderContent called with requestId:', requestId, 'inputInfo.message:', inputInfo.message);
+
+    // 如果有 requestId（从 URL 加载），显示 ChatView 但不传递 message
+    if (requestId) {
+      console.log('Home: Rendering ChatView for requestId:', requestId);
+      return <ChatView inputInfo={{message: "", deepThink: false}} product={product} requestId={requestId} />;
+    }
+
+    // 如果已经有输入信息（用户输入），显示 ChatView
+    if (inputInfo.message.length > 0) {
+      console.log('Home: Rendering ChatView for inputInfo.message:', inputInfo.message);
+      return <ChatView inputInfo={inputInfo} product={product} requestId={requestId} />;
+    }
+
+    // 否则显示主页内容
     if (inputInfo.message.length === 0) {
+      console.log('Home: Rendering home page content');
       return (
-        <div className="pt-[120px] flex flex-col items-center">
+        <div className="pt-[60px] flex flex-col items-center">
           <Slogn />
           <div className="w-640 rounded-xl shadow-[0_18px_39px_0_rgba(198,202,240,0.1)]">
             <GeneralInput
@@ -111,7 +160,6 @@ const Home: GenieType.FC<HomeProps> = memo(() => {
         </div>
       );
     }
-    return <ChatView inputInfo={inputInfo} product={product} />;
   };
 
   return (

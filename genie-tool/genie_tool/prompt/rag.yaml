@@ -1,0 +1,40 @@
+document_preprocessing_prompt: |
+  你是一个专业的文档预处理专家。请对以下文档进行全面的预处理，包括重命名、分类、清理、生成描述和摘要。
+
+  分类可选的集合类型：
+  1. resumes - 个人简历
+  2. projects_experience - 项目和工作经验
+  3. job_postings - 职位招聘信息
+
+  文档内容：
+  {document_content}
+
+  原始文件名：{filename}
+
+  请完成以下预处理任务并以JSON格式返回结果：
+
+  1. **重命名 (rename)**: 无论是否提供文件名，都要根据文档内容生成一个有意义的文件名(5-15个中文字符，不包含特殊字符)
+  2. **描述 (description)**: 生成文档的简要描述(20-30个字符)
+  3. **摘要 (abstract)**: 生成文档的详细摘要, 对全文总结凝练(80-100个字符)
+  4. **清理 (cleaning)**: 清理文档内容中的无用的格式(比如html的格式，PDF/word/excel/powerpoint的格式等)，但像是 markdown 这种组织结构的格式可以保留。但是需要在较为相关的内容之间保留连续性，删除过多的空行或者换行。在相关性较弱的段落之间，添加"\\n---\\n"来进行分割。
+  5. **分类 (classification)**: 确定文档所属的集合类型，从上面的分类列表中选取
+
+  返回格式：
+  {{
+      "renamed_filename": "生成的有意义文件名",
+      "description": "20-30字符的简要描述",
+      "abstract": "80-100字符的详细摘要",
+      "cleaned_content": "清理后的规范化文本内容",
+      "collection_type": "集合类型",
+  }}
+
+  示例输出：
+  {{
+      "renamed_filename": "xxx软件工程师简历",
+      "description": "xxx的资深软件工程师个人简历",
+      "abstract": "具有5年Java开发经验的软件工程师，学历优秀，有分布式和流媒体大型项目经验，求职放心为后端开发，...",
+      "cleaned_content": "清理后的完整文档内容...",
+      "collection_type": "resumes",
+  }}
+
+  不要输出除JSON外的任何其他文字或格式符号。
