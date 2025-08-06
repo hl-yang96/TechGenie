@@ -4,7 +4,7 @@
 
 基于 JoyAgent-JDGenie 构建的**个人技术助手智能体**，基于 个人知识库+代码库 的智能分析，完成智能回答，代码分析，技术报告，文档生成，面试准备，简历优化等复杂任务。
 
-项目主页：[https://tech-genie.lovable.app/](https://tech-genie.lovable.app/)
+Check it out at: [tech-genie.lovable.app/](https://tech-genie.lovable.app/)
 
 ## 示例
 
