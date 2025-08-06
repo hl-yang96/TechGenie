@@ -8,8 +8,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # 配置文件路径
-CONFIG_FILE_TEMPLATE="genie-backend/src/main/resources/application.yml"
-CONFIG_FILE="genie-backend/src/main/resources/application-in-use.yml"
+CONFIG_FILE="genie-backend/src/main/resources/application.yml"
 ENV_TEMPLATE="genie-tool/.env_template"
 ENV_FILE="genie-tool/.env"
 
@@ -17,7 +16,6 @@ ENV_FILE="genie-tool/.env"
 check_config_completed() {
     if [ ! -f "$CONFIG_FILE" ]; then
         echo -e "${RED}❌ 配置文件 $CONFIG_FILE 不存在${NC}"
-        echo -e "${RED}❌ 请复制配置文件模板行配置: cp $CONFIG_FILE_TEMPLATE $CONFIG_FILE，然后进行配置。${NC}"
         return 1
     fi
     
