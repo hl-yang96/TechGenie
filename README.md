@@ -4,6 +4,8 @@
 
 基于 JoyAgent-JDGenie 构建的**个人技术助手智能体**，基于 个人知识库+代码库 的智能分析，完成智能回答，代码分析，技术报告，文档生成，面试准备，简历优化等复杂任务。
 
+项目主页：[https://tech-genie.lovable.app/](https://tech-genie.lovable.app/)
+
 ## 示例
 
 ### 1. 基于高并发缓存流式处理项目的面试题生成
@@ -40,7 +42,7 @@
 
 ### 准备工作
 
-1. 手动拷贝模板 genie-backend/src/main/resources/application.yml 到 genie-backend/src/main/resources/application-in-use.yml中，然后更新 base_url、apikey、model、max_tokens、model_name 等配置
+1. Java 后端配置文件在 genie-backend/src/main/resources/application.yml，更新 base_url、apikey、model、max_tokens、model_name 等配置
   - 里面的各 Agent 角色下面的 model_name 字段，应该填写 llm.settings 这个 dict 中你设置的 key，而不是内部的 model_name，注意一下这个;
   - 使用DeepSeek时: 注意deepseek-chat 为max_tokens: 8192
 
